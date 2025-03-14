@@ -26,8 +26,8 @@ RUN echo "extension=opentelemetry.so\n" \
     "opentelemetry.instrumentation.enabled=1\n" \
     >> /usr/local/etc/php/conf.d/opentelemetry.ini
 
-# Copy your project (if not using volumes)
-COPY ./public /var/www/html
-
 # Enable Apache mod_rewrite if Slim needs pretty URLs
 RUN a2enmod rewrite
+
+# 4. Copy your custom vhost config, replacing default 000-default.conf
+COPY apache_vhost.conf /etc/apache2/sites-available/000-default.conf
