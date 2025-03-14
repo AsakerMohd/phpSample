@@ -51,11 +51,7 @@ class Routes
              */
             $s3Client = new S3Client([
                 'version' => 'latest',
-                'region'  => 'us-east-1', // change to your region
-                'credentials' => [
-                    'key'    => 'YOUR_AWS_ACCESS_KEY',
-                    'secret' => 'YOUR_AWS_SECRET_KEY',
-                ],
+                'region'  => 'us-east-1'
             ]);
 
             try {
@@ -83,6 +79,37 @@ class Routes
 
             // Return response as JSON
             $response->getBody()->write(json_encode($body));
+            return $response->withHeader('Content-Type', 'application/json');
+        });
+
+        // New route: GET /db-users
+        $app->get('/db-users', function (Request $request, Response $response) {
+            // Match these to your docker-compose environment variables or define inline
+            $host = getenv('DB_HOST') ?: 'db';
+            $db   = getenv('DB_NAME') ?: 'my_app_db';
+            $user = getenv('DB_USER') ?: 'my_app_user';
+            $pass = getenv('DB_PASS') ?: 'my_app_password';
+
+            try {
+                // Connect to MySQL via PDO
+                $pdo = new PDO("mysql:host=$host;dbname=$db;charset=utf8mb4", $user, $pass);
+
+                // Query all users
+                $stmt = $pdo->query("SELECT FirstName, LastName FROM Users");
+                $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+                // Return as JSON
+                $response->getBody()->write(json_encode([
+                    'users' => $users
+                ]));
+            } catch (PDOException $e) {
+                // If there's a DB error, return 500
+                $response->getBody()->write(json_encode([
+                    'error' => $e->getMessage()
+                ]));
+                return $response->withStatus(500)->withHeader('Content-Type', 'application/json');
+            }
+
             return $response->withHeader('Content-Type', 'application/json');
         });
     }
