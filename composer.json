@@ -8,6 +8,7 @@
     "open-telemetry/opentelemetry-auto-slim": "dev-main",
     "open-telemetry/opentelemetry-auto-psr18": "dev-main",
     "open-telemetry/opentelemetry-auto-guzzle": "dev-main",
+    "open-telemetry/opentelemetry-auto-pdo": "dev-main",
     "nyholm/psr7": "^1.8@dev"
   },
   "minimum-stability": "dev",

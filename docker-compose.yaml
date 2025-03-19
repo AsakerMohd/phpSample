@@ -23,9 +23,10 @@ services:
       - .:/var/www/html
     ports:
       - "8080:80"
+    network_mode: "host"
     environment:
       # MySQL DB environment
-      - DB_HOST=db
+      - DB_HOST=127.0.0.1
       - DB_NAME=my_app_db
       - DB_USER=my_app_user
       - DB_PASS=my_app_password
@@ -35,7 +36,7 @@ services:
       - OTEL_SERVICE_NAME=php-sample-ec2
       - OTEL_TRACES_EXPORTER=otlp
       - OTEL_EXPORTER_OTLP_PROTOCOL=http/protobuf
-      - OTEL_EXPORTER_OTLP_ENDPOINT=host.docker.internal:4316
+      - OTEL_EXPORTER_OTLP_ENDPOINT=http://localhost:4316
       - OTEL_PROPAGATORS=baggage,tracecontext
       # If collector is in the same docker-compose, add it there & link it
       # or update the endpoint to your external service if needed

@@ -92,11 +92,11 @@ class Routes
 
             try {
                 // Connect to MySQL via PDO
-                $pdo = new PDO("mysql:host=$host;dbname=$db;charset=utf8mb4", $user, $pass);
+                $pdo = new \PDO("mysql:host=$host;dbname=$db;charset=utf8mb4", $user, $pass);
 
                 // Query all users
                 $stmt = $pdo->query("SELECT FirstName, LastName FROM Users");
-                $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
+                $users = $stmt->fetchAll(\PDO::FETCH_ASSOC);
 
                 // Return as JSON
                 $response->getBody()->write(json_encode([

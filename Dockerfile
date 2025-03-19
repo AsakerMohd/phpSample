@@ -1,5 +1,5 @@
 # Dockerfile
-FROM php:8.1-apache
+FROM php:8.2-apache
 
 # Install system packages required for building/compiling PECL extensions
 RUN apt-get update && apt-get install -y \
