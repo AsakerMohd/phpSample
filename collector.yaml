@@ -1,0 +1,47 @@
+extensions:
+  health_check:
+    endpoint: 0.0.0.0:13133
+  awsproxy:
+    endpoint: 0.0.0.0:2000
+receivers:
+  otlp:
+    protocols:
+      # grpc:
+      #   endpoint: 0.0.0.0:4317
+      http:
+        endpoint: 0.0.0.0:4316
+
+processors:
+  batch:
+
+exporters:
+  logging/logging_debug:
+    loglevel: debug
+  logging/logging_info:
+    loglevel: debug
+  file/logs:
+    path: /log/otel/logs.log
+  awsxray:
+    region: us-west-2
+  awsemf:
+
+service:
+  pipelines:
+    traces:
+      receivers: [otlp]
+      processors: [batch]
+      exporters: [logging/logging_debug, awsxray]
+    metrics:
+      receivers: [otlp]
+      processors: [batch]
+      exporters: [logging/logging_debug]
+    logs:
+      receivers: [otlp]
+      processors: [batch]
+      exporters: [logging/logging_debug, file/logs]
+
+  extensions: [health_check, awsproxy]
+
+  telemetry:
+    logs:
+      level: "DEBUG"

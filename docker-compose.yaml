@@ -14,16 +14,29 @@ services:
     ports:
       - "3306:3306"
 
+  awscollector:
+    image: amazon/aws-otel-collector
+    command: ["--config=/otel-config.yaml"]
+    volumes:
+      - ./collector.yaml:/otel-config.yaml
+      - ./log:/log/otel
+    environment:
+      - AWS_REGION=us-west-2
+      - AWS_ACCESS_KEY_ID=
+      - AWS_SECRET_ACCESS_KEY=
+      - AWS_SESSION_TOKEN=
+
+    ports:
+     - '4316:4316'
+     - '13133:13133'
+
   php:
-    build: .
     container_name: my_php_app
+    image: php:latest
     depends_on:
       - db
-    volumes:
-      - .:/var/www/html
     ports:
-      - "8080:80"
-    network_mode: "host"
+      - "8000:8080"
     environment:
       # MySQL DB environment
       - DB_HOST=127.0.0.1
@@ -31,13 +44,18 @@ services:
       - DB_USER=my_app_user
       - DB_PASS=my_app_password
 
+      - AWS_ACCESS_KEY_ID=
+      - AWS_SECRET_ACCESS_KEY=
+      - AWS_SESSION_TOKEN=
+
       # OTel environment
       - OTEL_PHP_AUTOLOAD_ENABLED=true
       - OTEL_SERVICE_NAME=php-sample-ec2
-      - OTEL_TRACES_EXPORTER=otlp
+      - OTEL_TRACES_EXPORTER=console
       - OTEL_EXPORTER_OTLP_PROTOCOL=http/protobuf
-      - OTEL_EXPORTER_OTLP_ENDPOINT=http://localhost:4316
+      - OTEL_EXPORTER_OTLP_TRACES_ENDPOINT=http://awscollector:4316/v1/traces
       - OTEL_PROPAGATORS=baggage,tracecontext
+      # - OTEL_PHP_DISABLED_INSTRUMENTATIONS=slim,guzzle
       # If collector is in the same docker-compose, add it there & link it
       # or update the endpoint to your external service if needed
 
